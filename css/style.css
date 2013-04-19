@@ -1,0 +1,11 @@
+body {background-image: url(file:///Users/scottyadmin/Desktop/coding-exercise-master/images/bg.png);}
+	.MRApplicationDisplay {background: url(file:///Users/scottyadmin/Desktop/coding-exercise-master/images/awesome_logo.png) no-repeat; position: absolute;}
+		.MRLeaderBoard {background-color: #000; position: relative; -moz-border-radius: 25px; border-radius: 25px;}
+			.MRAppResults {color: #FFF; opacity: 1; font: 18px Helvetica, “Helvetica Neue”, Arial, sans-serif; width: 100%;}
+				.MRResult {padding: 15px 26px 8px 28px; border-bottom: 1px solid #3f4040;}
+				.MRResultNumber4 {border: none;}
+					.mentions {float: right; font-size: 14px; font-weight: normal;}
+						.number {color: #9e0b0f; font-size: 18px;}
+						.numberLabel {color: #ccc; padding-left: 7px;}
+		.MRLeaderBoardBorder {border: 5px solid #d0cfcf; position: absolute; -moz-border-radius: 25px; border-radius: 25px;}
+		svg {position: absolute;}
