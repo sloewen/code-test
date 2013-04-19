@@ -66,14 +66,12 @@ function getBandsToBeRemovedAndKept(cur, prev){
 	for(i = 0; i < prev.length; i++) {
 		for (j = 0; j < cur.length; j++){
 			if(prev[i].name == cur[j].name) {
-				indicesToBeRemoved.push(i);
-			} else {
-				bandsToBeKept.push(cur[j]);
-			}
+				bandsToBeKept.push(i);
+			} 
 		}
 	}
 
-	console.log(indicesToBeRemoved);
+	console.log('removed ' + indicesToBeRemoved + ' kept ' + bandsToBeKept);
 	return indicesToBeRemoved;
 }
 function makeDisplay () {
@@ -96,28 +94,37 @@ function makeDisplay () {
 							  .css('left', (appDisplay.width/2) - (resultsBox.width/2) - resultsBox.offsetLeft);
 	$('.MRLeaderBoardBorder').append('<div class="MRAppResults"></div>');
 }
+
+function moveExistingBandsToNewPositions() {
+	//get the new position
+}
+
 function removeOldResults() {
 	resultsBox.currentResult = 0;
-	shiftBands($('#MRResultNumber' + indicesToBeRemoved[0]), 'out');
+	shiftBand($('#MRResultNumber' + indicesToBeRemoved[0]), 'out');
 }
 function setResults(object, array, numResults){
 
 }
 function shiftBand(band, direction){
 	
+	if (direction == 'about') {
+
+	}
+
 	if (direction == 'in') {
 		console.log(direction);
-		band.animate({ left: '0'}, 500, function() {
-			console.log('Animation complete. no callback');
+		band.animate({ left: '0'}, 300, function() {
 			resultsBox.currentResult ++;
 			if($('#MRResultNumber' + resultsBox.currentResult)) {
 				shiftBand($('#MRResultNumber' + resultsBox.currentResult), 'in');
 			}
 		});
-	} if (direction == 'out') {
+	} 
+
+	if (direction == 'out') {
 		if (resultsBox.currentResult < (indicesToBeRemoved.length)) {
 			band.animate({ left: (resultsBox.width + resultsBox.offsetLeft)}, 300, function() {
-				console.log('out Animation complete. no callback');
 				$('#MRResultNumber' + (indicesToBeRemoved[resultsBox.currentResult])).remove();
 				resultsBox.currentResult ++;
 				if($('#MRResultNumber' + indicesToBeRemoved[resultsBox.currentResult])) {
@@ -127,10 +134,9 @@ function shiftBand(band, direction){
 		} else {
 			//last time!
 			band.animate({ left: (resultsBox.width + resultsBox.offsetLeft)}, 300, function() {
-				console.log('out Animation complete. last time');
 				$('#MRResultNumber' + (indicesToBeRemoved[resultsBox.currentResult])).remove();
-				moveExistingBandsToNewPositions()
-				buildCurrentBands()
+				moveExistingBandsToNewPositions();
+				buildCurrentBands();
 				shiftBands(currentResults, 'in');
 			});
 		}

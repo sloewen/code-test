@@ -15,12 +15,10 @@ var options = {'limit': 5, 'frequency': 15},
 	}
 	prevResults = [],
 	currentResults = [];
-
 (function () {
 	makeDisplay();
 	app.start()
 })();
-
 function update (data) {
 	var i;
 	$('.MRAppResults').remove();
@@ -29,8 +27,6 @@ function update (data) {
 		$('.MRAppResults').append('<div class="MRResult MRResultNumber' + i + '">' + data[i].name + ' <span class="mentions"><span class="number">' + numberWithCommas(data[i].count) + '</span><span class="numberLabel">Mentions</span></span></div>');
 	}
 }
-
-function changeNumber(num){}
 function makeDisplay () {
 	appDisplay.position = {'x' : ((window.innerWidth/2) - (appDisplay.width/2)),  'y' : (window.innerHeight/2) - (appDisplay.height/2)}
 	$('body').append('<div class="MRApplicationDisplay"></div>');
@@ -43,7 +39,7 @@ function makeDisplay () {
 							  .css('height', resultsBox.height)
 							  .css('top', resultsBox.margin.top + resultsBox.offsetTop)
 							  .css('left', (appDisplay.width/2) - (resultsBox.width/2))
-							  .css('opacity', .45);
+							  .css('opacity', .8);
     $('.MRApplicationDisplay').append('<div class="MRLeaderBoardBorder"></div>');
 	$('.MRLeaderBoardBorder').css('width', resultsBox.width)
 							  .css('height', resultsBox.height)
@@ -53,5 +49,3 @@ function makeDisplay () {
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-
-
