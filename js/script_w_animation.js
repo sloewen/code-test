@@ -1,4 +1,4 @@
-var options = {'limit': 5, 'frequency': 5},
+var options = {'limit': 5, 'frequency': 15},
 	app = new window.massrel.Poller(options, update),
 	appDisplay = {
 		height : 325,
@@ -12,67 +12,62 @@ var options = {'limit': 5, 'frequency': 5},
 		margin : {'top' : 110}, //from the top of the app, not distance from logo
 		offsetLeft: 6,
 		offsetTop: 5,
-		currentResult: 0
+		currentResult: 0,
+		animationTime: 300,
 	}
+	deltaArray = [],
 	prevResults = [],
 	currentResults = [],
 	indicesToBeRemoved = [],
 	bandsToBeKept = [],
-	indicesToBeBuilt = [];
-//initialize the app
+	newBandsToBuild = [];
 (function () {
-	//get screen dimensions 
-	//make the box
 	makeDisplay();
-	//start the app
 	app.start()
 })();
-
-
-
-
-
 function update (data) {
-	var i;
-	indicesToBeRemoved = [];
-	bandsToBeKept = [];
+	resetArrays();
 	currentResults = data;
 	if(currentResults.length == prevResults.length) {
-		indicesToBeRemoved = getBandsToBeRemovedAndKept(currentResults, prevResults);
-		removeOldResults();
+		findIndexesToShiftOut(currentResults, prevResults);
 	} else {
 		buildCurrentBands();
-		shiftBands(currentResults, 'in');
 	}
 	prevResults = data;
-	
-	
 }
 function buildCurrentBands() {
-	for (i = 0; i < appDisplay.numOfResults; i++) {
-		$('.MRAppResults').append('<div id="MRResultNumber' + i + '" class="MRResult MRResultNumber' + i + '">' + currentResults[i].name + ' <span class="mentions"><span class="number">' + currentResults[i].count + '</span><span class="numberLabel">Mentions</span></span></div>')
-						  .css('clip', 'rect(0, ' + resultsBox.width + 'px, ' + resultsBox.height + 'px, 0)')
-						  
-		$('#MRResultNumber' + i).css('left', ((resultsBox.width + resultsBox.offsetLeft) *  -1))
-							    .css('top', (i * resultsBox.height/appDisplay.numOfResults));
-	}
-}
-function changeNumber(num){}
-
-function getBandsToBeRemovedAndKept(cur, prev){
-	var i, 
-		j;
-
-	for(i = 0; i < prev.length; i++) {
-		for (j = 0; j < cur.length; j++){
-			if(prev[i].name == cur[j].name) {
-				bandsToBeKept.push(i);
-			} 
+	if (bandsToBeKept.length == 0) {
+		for (i = 0; i < appDisplay.numOfResults; i++) {
+			$('.MRAppResults').append(makeBandDiv(i, currentResults[i].name, currentResults[i].count))
+						  	 .css('clip', 'rect(0, ' + resultsBox.width + 'px, ' + resultsBox.height + 'px, 0)')
+			$('#MRResultNumber' + i).css('left', ((resultsBox.width + resultsBox.offsetLeft) *  -1))
+							    	.css('top', (i * resultsBox.height/appDisplay.numOfResults));
+		}
+		shiftBand(0, 'in', currentResults);
+	} else {
+		for (i = 0; i < newBandsToBuild.length; i++) {
+			$('.MRAppResults').append(makeBandDiv(newBandsToBuild[i].rank , newBandsToBuild[i].name, newBandsToBuild[i].count))
+						  	 .css('clip', 'rect(0, ' + resultsBox.width + 'px, ' + resultsBox.height + 'px, 0)')
+			$('#MRResultNumber' + newBandsToBuild[i].rank).css('left', ((resultsBox.width + resultsBox.offsetLeft) *  -1))
+							    	.css('top', (newBandsToBuild[i].rank * resultsBox.height/appDisplay.numOfResults));
 		}
 	}
-
-	console.log('removed ' + indicesToBeRemoved + ' kept ' + bandsToBeKept);
-	return indicesToBeRemoved;
+	if (newBandsToBuild.length > 0){
+		shiftBand(newBandsToBuild[0].rank, 'in', currentResults);
+	} else {
+		shiftBand(0, 'in', currentResults);
+	}
+}
+function replaceRemainingBandsWithNewDomElements() {
+	var i, topValue, leftValue = 0;
+	for(i = 0; i < bandsToBeKept.length; i++){
+		topValue = bandsToBeKept[i].previousIndex * resultsBox.height/appDisplay.numOfResults;
+		$('#MRResultNumber' + bandsToBeKept[i].previousIndex).remove();
+		$('.MRAppResults').append(makeBandDiv(bandsToBeKept[i].currentIndex, currentResults[bandsToBeKept[i].currentIndex].name, currentResults[bandsToBeKept[i].currentIndex].count))
+						  	 .css('clip', 'rect(0, ' + resultsBox.width + 'px, ' + resultsBox.height + 'px, 0)');
+		$('#MRResultNumber' + bandsToBeKept[i].currentIndex).css({'left': leftValue, 'top': topValue});
+	}
+	shiftBand(bandsToBeKept[0].currentIndex, 'about');
 }
 function makeDisplay () {
 	appDisplay.position = {'x' : ((window.innerWidth/2) - (appDisplay.width/2)),  'y' : (window.innerHeight/2) - (appDisplay.height/2)}
@@ -94,63 +89,141 @@ function makeDisplay () {
 							  .css('left', (appDisplay.width/2) - (resultsBox.width/2) - resultsBox.offsetLeft);
 	$('.MRLeaderBoardBorder').append('<div class="MRAppResults"></div>');
 }
-
-function moveExistingBandsToNewPositions() {
-	//get the new position
+function makeBandDiv(orderNum, name, counts) {
+	return '<div id="MRResultNumber' + orderNum + '" class="MRResult MRResultNumber' 
+									 + orderNum + '"><span class="bandName">' 
+									 + name + '</span><span class="mentions"><span class="number">' 
+									 + counts + '</span><span class="numberLabel">Mentions</span></span></div>';
 }
-
-function removeOldResults() {
-	resultsBox.currentResult = 0;
-	shiftBand($('#MRResultNumber' + indicesToBeRemoved[0]), 'out');
+function resetArrays() {
+	indicesToBeRemoved = [];
+	bandsToBeKept = [];
+	deltaArray = [];
+	newBandsToBuild = [];
 }
-function setResults(object, array, numResults){
-
-}
-function shiftBand(band, direction){
-	
-	if (direction == 'about') {
-
-	}
-
+function shiftBand(index, direction, array){
+	var thisBand = $('#MRResultNumber' + index),
+		nextBandIndex;
 	if (direction == 'in') {
-		console.log(direction);
-		band.animate({ left: '0'}, 300, function() {
-			resultsBox.currentResult ++;
-			if($('#MRResultNumber' + resultsBox.currentResult)) {
-				shiftBand($('#MRResultNumber' + resultsBox.currentResult), 'in');
-			}
-		});
-	} 
-
-	if (direction == 'out') {
-		if (resultsBox.currentResult < (indicesToBeRemoved.length)) {
-			band.animate({ left: (resultsBox.width + resultsBox.offsetLeft)}, 300, function() {
-				$('#MRResultNumber' + (indicesToBeRemoved[resultsBox.currentResult])).remove();
-				resultsBox.currentResult ++;
-				if($('#MRResultNumber' + indicesToBeRemoved[resultsBox.currentResult])) {
-					shiftBand($('#MRResultNumber' + indicesToBeRemoved[resultsBox.currentResult]), 'out');
-				}
+		if (index >=0) {
+			thisBand.animate({ left: '0'}, resultsBox.animationTime, function() {
+				nextBandIndex = findNextIndexToShiftIn(index);
+				shiftBand(nextBandIndex, 'in', array);
 			});
 		} else {
-			//last time!
-			band.animate({ left: (resultsBox.width + resultsBox.offsetLeft)}, 300, function() {
-				$('#MRResultNumber' + (indicesToBeRemoved[resultsBox.currentResult])).remove();
-				moveExistingBandsToNewPositions();
-				buildCurrentBands();
-				shiftBands(currentResults, 'in');
-			});
+			thisBand.animate({ left: '0'}, resultsBox.animationTime);
 		}
 		
+	} else if (direction == 'out') {
+		nextBandIndex = findNextIndex(index, array);
+		if (nextBandIndex >= 0) {
+			thisBand.animate({ left: appDisplay.width }, resultsBox.animationTime, function() {
+				thisBand.remove();
+				shiftBand(nextBandIndex, 'out', array);
+			});
+		} else {
+			thisBand.animate({ left: appDisplay.width }, resultsBox.animationTime, function () {
+				thisBand.remove();
+				replaceRemainingBandsWithNewDomElements();
+			});
+		}
+	} else if (direction == 'about') {
+		nextBandIndex = findNextAboutIndex(index, bandsToBeKept);
+		$('#MRResultNumber' + index + ' .number').text(currentResults[index].count);
+		if(index == 4) {
+			thisBand.animate({borderBottomWidth: "0px"}, 100)
+		} else {
+			thisBand.animate({borderBottomWidth: "1px"}, 100)
+		}
+		if (nextBandIndex >= 0) {
+			thisBand.animate({ top: (index * resultsBox.height / appDisplay.numOfResults) }, resultsBox.animationTime, 'swing', function () {
+				shiftBand(nextBandIndex, 'about');
+			});
+		} else {
+			thisBand.animate({ top: (index * resultsBox.height / appDisplay.numOfResults) }, resultsBox.animationTime, 'swing', function () {
+					buildCurrentBands();
+			});
+		}
 	}
-
-	
 	
 }
-function shiftBands(data, direction) {
-	resultsBox.currentResult = 0;
-	shiftBand($('#MRResultNumber' + 0), direction);
+
+function findIndexesToShiftOut(current, previous){
+	var i, j, isInBoth;
+	for(i = 0; i < previous.length; i++){
+		isInBoth = false;
+		for (j=0; j < current.length; j++){
+			if (previous[i].name == current[j].name){
+				isInBoth = true;
+				bandsToBeKept.push({'previousIndex' : i, 'currentIndex' : j});
+			}
+		}
+		if (!isInBoth) {
+			deltaArray.push(i);
+		}
+	}
+	findNewBandsToBuild(currentResults, prevResults);
+	shiftBand(deltaArray[0], 'out', deltaArray);
 }
-function siftResults(prev, current){}
-	//grab the first <numResults> from the array
-
-
+function findNextIndex(value, array) {
+	var nextIndex = (jQuery.inArray(value, array)+1);
+	if (deltaArray[nextIndex]) {
+		return deltaArray[nextIndex];
+	} 
+	return -1;
+}
+function findNextAboutIndex(value, array) {
+	var i;
+	for (i=0; i < array.length; i++){
+		if (value == array[i].currentIndex){
+			if(i == (array.length - 1)){
+				return -1;
+			} else {
+				return array[(i +	1)].currentIndex;	
+			}
+		} 
+	}
+	return -1;
+}
+function findNextIndexToShiftIn(index) {
+	var i, nextIndex;
+	if (newBandsToBuild.length == 0) {
+		if(index < appDisplay.numOfResults){
+			return index + 1;
+		} else {
+			return -1;
+		}
+	} else {
+		for (i=0; i < newBandsToBuild.length; i++){
+			
+			if (index == newBandsToBuild[i].rank){
+				if(i == (newBandsToBuild.length - 1)){
+					return -1;
+				} else {
+					return newBandsToBuild[(i +	1)].rank;	
+				}
+			} 
+		}
+		return -1;
+	}
+}
+function findNewBandsToBuild(current, previous) {
+	var i, j, isInBoth;
+	for(i = 0; i < current.length; i++){
+		isInBoth = false;
+		for (j=0; j < previous.length; j++){
+			if (current[i].name == previous[j].name){
+				isInBoth = true;
+			}
+		}
+		if (!isInBoth) {
+			newBand = {
+				name : current[i].name,
+				count : current[i].count,
+				rank : i,
+			}
+			newBandsToBuild.push(newBand);
+		}
+	}
+	return newBandsToBuild;
+}

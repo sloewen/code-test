@@ -3,7 +3,7 @@ body {background-image: url(../images/bg.png);}
 		.MRLeaderBoard {background-color: #000; position: relative; -moz-border-radius: 25px; border-radius: 25px;}
 			.MRAppResults {color: #FFF; opacity: 1; font: 18px Helvetica, “Helvetica Neue”, Arial, sans-serif; width: 100%; position: absolute;}
 				.MRResult {padding: 15px 26px 8px 28px; border-bottom: 1px solid #3f4040; left: 0; position: absolute; width: 90%;}
-				.MRResultNumber4 {border: none;}
+				.MRResultNumber4 {border-width: 0;}
 					.mentions {float: right; font-size: 14px; font-weight: normal;}
 						.number {color: #9e0b0f; font-size: 18px;}
 						.numberLabel {color: #ccc; padding-left: 7px;}
