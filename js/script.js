@@ -13,16 +13,16 @@ bestBands = function () {
 		margin : {'top' : 110},
 		offsetLeft: 6,
 		offsetTop: 5
-	}
+	},
 	prevResults = [],
 	currentResults = [];
 
 	return {
 		init: function () {
 			makeDisplay();
-			app.start()
+			app.start();
 		}
-	}
+	};
 
 	function update (data) {
 		var i;
@@ -33,7 +33,7 @@ bestBands = function () {
 		}
 	}
 	function makeDisplay () {
-		appDisplay.position = {'x' : ((window.innerWidth/2) - (appDisplay.width/2)),  'y' : (window.innerHeight/2) - (appDisplay.height/2)}
+		appDisplay.position = {'x' : ((window.innerWidth/2) - (appDisplay.width/2)),  'y' : (window.innerHeight/2) - (appDisplay.height/2)};
 		$('body').append('<div class="MRApplicationDisplay"></div>');
 		$('.MRApplicationDisplay').css({'width': appDisplay.width, 
 										'height': appDisplay.height,
@@ -45,7 +45,7 @@ bestBands = function () {
 								  'height': resultsBox.height,
 								  'top': resultsBox.margin.top + resultsBox.offsetTop,
 								  'left': (appDisplay.width/2) - (resultsBox.width/2),
-								  'opacity': .8});
+								  'opacity': 0.8});
 	    $('.MRApplicationDisplay').append('<div class="MRLeaderBoardBorder"></div>');
 		$('.MRLeaderBoardBorder').css({'width': resultsBox.width,
 								  'height': resultsBox.height,
